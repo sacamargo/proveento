@@ -1,15 +1,12 @@
 import { Separator } from "@/components/ui/separator";
 import { formatMoney } from "@/lib/format";
 import {
+  formatDelivery,
+  formatWarranty,
+  installationCopy,
   parseProposalDetails,
   type ProposalMedia,
 } from "@/lib/proposal-details";
-
-const installationCopy = {
-  not_needed: "No aplica",
-  included: "Incluida",
-  not_included: "No incluida",
-} as const;
 
 type ProposalDetailsCardProps = {
   price: number;
@@ -32,9 +29,7 @@ export function ProposalDetailsCard({
       </p>
       <p>
         <span className="text-muted-foreground">Entrega: </span>
-        {details.deliveryIncluded
-          ? "Incluida en el precio"
-          : `No incluida · ${formatMoney(details.deliveryCost ?? 0)}`}
+        {formatDelivery(details, formatMoney)}
       </p>
       <p>
         <span className="text-muted-foreground">Instalación: </span>
@@ -42,8 +37,7 @@ export function ProposalDetailsCard({
       </p>
       <p>
         <span className="text-muted-foreground">Garantía: </span>
-        {details.warrantyYears}{" "}
-        {details.warrantyYears === 1 ? "año" : "años"}
+        {formatWarranty(details)}
       </p>
       {details.notes ? (
         <>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -38,6 +39,22 @@ const WARRANTY_OPTIONS = [
   { value: "other", label: "Otro" },
 ];
 
+function emptyProposal(requestId: string): CreateProposalInput {
+  return {
+    requestId,
+    providerId: "",
+    totalPrice: 0,
+    deliveryIncluded: true,
+    deliveryCost: 0,
+    installationNeeded: false,
+    installationIncluded: false,
+    warrantyPreset: "1",
+    warrantyOtherYears: 0,
+    conditions: "",
+    media: [],
+  };
+}
+
 type CreateProposalFormProps = {
   requestId: string;
   providers: AdminProvider[];
@@ -49,22 +66,12 @@ export function CreateProposalForm({
 }: CreateProposalFormProps) {
   const [providers, setProviders] = useState(initialProviders);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [mediaUploading, setMediaUploading] = useState(false);
 
   const form = useForm<CreateProposalInput>({
     resolver: zodResolver(createProposalSchema),
-    defaultValues: {
-      requestId,
-      providerId: "",
-      totalPrice: 0,
-      deliveryIncluded: true,
-      deliveryCost: 0,
-      installationNeeded: false,
-      installationIncluded: false,
-      warrantyPreset: "1",
-      warrantyOtherYears: 0,
-      conditions: "",
-      media: [],
-    },
+    defaultValues: emptyProposal(requestId),
     mode: "onBlur",
   });
 
@@ -92,10 +99,14 @@ export function CreateProposalForm({
 
   async function onSubmit(values: CreateProposalInput) {
     setSubmitError(null);
+    setSaved(false);
     const result = await createProposalAsAdmin(values);
     if (result?.error) {
       setSubmitError(result.error);
+      return;
     }
+    form.reset(emptyProposal(requestId));
+    setSaved(true);
   }
 
   return (
@@ -384,6 +395,7 @@ export function CreateProposalForm({
                   requestId={requestId}
                   value={field.value}
                   onChange={field.onChange}
+                  onUploadingChange={setMediaUploading}
                 />
                 <FieldError errors={[fieldState.error]} />
               </Field>
@@ -391,6 +403,15 @@ export function CreateProposalForm({
           />
         </FieldGroup>
       </FieldSet>
+
+      {saved && !form.formState.isDirty ? (
+        <p
+          role="status"
+          className="rounded-lg border border-border bg-muted px-3 py-2 text-sm"
+        >
+          Propuesta guardada. El formulario quedó listo para otra cotización.
+        </p>
+      ) : null}
 
       {submitError ? (
         <div
@@ -406,9 +427,19 @@ export function CreateProposalForm({
       <Button
         type="submit"
         className="min-h-11"
-        disabled={form.formState.isSubmitting}
+        disabled={form.formState.isSubmitting || mediaUploading}
       >
-        {form.formState.isSubmitting ? "Guardando…" : "Guardar propuesta"}
+        {mediaUploading || form.formState.isSubmitting ? (
+          <Loader2
+            data-icon="inline-start"
+            className="animate-spin motion-reduce:animate-none"
+          />
+        ) : null}
+        {mediaUploading
+          ? "Subiendo archivos…"
+          : form.formState.isSubmitting
+            ? "Guardando…"
+            : "Guardar propuesta"}
       </Button>
     </form>
   );

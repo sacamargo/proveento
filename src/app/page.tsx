@@ -57,14 +57,18 @@ export default async function HomePage({
                   </Button>
                 ) : (
                   <Button asChild className="min-h-11">
-                    <Link href="/request/new">Nueva solicitud</Link>
+                    <Link href="/dashboard">Mis solicitudes</Link>
                   </Button>
                 )}
                 {profile?.role === "ADMIN" ? (
                   <Button asChild variant="secondary" className="min-h-11">
+                    <Link href="/dashboard">Mis solicitudes</Link>
+                  </Button>
+                ) : (
+                  <Button asChild variant="secondary" className="min-h-11">
                     <Link href="/request/new">Nueva solicitud</Link>
                   </Button>
-                ) : null}
+                )}
                 <form action={logout}>
                   <Button
                     type="submit"
