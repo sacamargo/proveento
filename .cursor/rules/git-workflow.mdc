@@ -1,0 +1,45 @@
+---
+description: Flujo Git obligatorio de Proveento (ramas, commits y autor)
+alwaysApply: true
+---
+
+# Flujo Git de Proveento
+
+Esto es obligatorio en cada cambio. No hay excepciones salvo el bootstrap de un repo vacío.
+
+## Ramas
+
+- Funcionalidad nueva = rama nueva. Nunca commitear directo en `main` ni en `develop`.
+- Parte siempre de `develop` actualizado: `git checkout develop && git pull && git checkout -b <rama>`.
+- El nombre describe la funcionalidad, en kebab-case:
+  - `feat/formulario-request`
+  - `fix/ceguera-proveedor`
+  - `chore/regla-git`
+- Flujo: `feat/*` → PR a `develop` → PR `develop` → `main`.
+- `main` solo recibe merges desde `develop` (producción).
+
+## Commits
+
+- Mensaje en español, 1 o 2 oraciones. Primero el porqué, luego el qué si hace falta.
+- Claro y concreto. Prohibido: `update`, `fix stuff`, `wip`, `changes`.
+
+```
+Agregar autenticación de compradores con Supabase.
+
+Crea login, signup y sincroniza el perfil en Prisma.
+```
+
+- Un commit por intención. No mezclar feat + refactor + docs sin necesidad.
+- Nunca `--no-verify`, `--no-gpg-sign` ni amend de commits ajenos o ya pusheados.
+
+## Autor
+
+- Los commits salen con `user.name` y `user.email` del repo (hoy `sacamargo`).
+- Nunca cambiar `git config`. Nunca forzar autor de Cursor ni `GIT_AUTHOR_NAME=Cursor`.
+- Si el autor no es el dueño del repo, detenerse y avisar.
+
+## Push
+
+- Push de la rama de funcionalidad: `git push -u origin HEAD`.
+- No push directo a `main` ni a `develop`.
+- No incluir `.env`, `.env.local` ni secretos.

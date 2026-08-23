@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  BUYER
+  ADMIN
+  PROVIDER
+}
+
+enum RequestStatus {
+  ACTIVE
+  MATCHED
+  CLOSED
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id        String     @id @default(uuid())
+  role      Role       @default(BUYER)
+  email     String     @unique
+  name      String
+  phone     String?
+  requests  Request[]
+  proposals Proposal[]
+}
+
+model Request {
+  id        String        @id @default(uuid())
+  buyerId   String
+  buyer     User          @relation(fields: [buyerId], references: [id])
+  status    RequestStatus @default(ACTIVE)
+  city      String
+  deadline  DateTime
+  items     Json
+  createdAt DateTime      @default(now())
+  proposals Proposal[]
+}
+
+model Proposal {
+  id         String         @id @default(uuid())
+  requestId  String
+  request    Request        @relation(fields: [requestId], references: [id])
+  providerId String
+  provider   User           @relation(fields: [providerId], references: [id])
+  totalPrice Float
+  conditions String
+  status     ProposalStatus @default(PENDING)
+  createdAt  DateTime       @default(now())
+}
