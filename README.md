@@ -14,7 +14,12 @@ feat/mi-funcionalidad  →  develop  →  main
 4. Push de la rama de funcionalidad. PR a `develop`. Cuando esté estable, PR de `develop` a `main`.
 5. Los commits salen con la identidad Git local del dueño del repo. Nunca como Cursor.
 
-Detalle para el agente: `.cursor/rules/git-workflow.mdc`.
+Detalle para el agente: `.cursor/rules/` (siempre activo):
+
+- `git-workflow.mdc` — ramas y commits
+- `proveento-architecture.mdc` — PLAN y Blind Broker
+- `ui-design.mdc` — skill UI/UX Pro Max
+- `agent-checklist.mdc` — orden obligatorio al inicio de cada ajuste
 
 ## Stack
 

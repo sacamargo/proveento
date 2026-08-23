@@ -1,0 +1,17 @@
+---
+description: Diseño UI/UX Pro Max, web y móvil
+alwaysApply: true
+---
+
+# Diseño Proveento
+
+Cualquier cambio visual o de formulario debe seguir la skill `ui-ux-pro-max`.
+
+1. Leer `design-system/proveento/MASTER.md` si existe. Si no, generarlo con el search de la skill (`--design-system --persist`).
+2. Si hay override de página en `design-system/proveento/pages/`, manda sobre Master.
+3. Buscar en la skill: UX del componente + stack `nextjs` o `shadcn`.
+4. Mobile-first: tap ≥44px, labels visibles, error junto al campo, sin hover-only.
+5. Tokens semánticos (no hex sueltos). Iconos Lucide, nunca emoji.
+6. Contraste 4.5:1. Respetar `prefers-reduced-motion`.
+7. Antes de cerrar UI, revisar `quick-reference.md` §§1–3 y 8 (forms).
+---

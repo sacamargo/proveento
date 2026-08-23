@@ -1,0 +1,17 @@
+---
+description: Checklist obligatorio al inicio de cada ajuste
+alwaysApply: true
+---
+
+# Antes de cada ajuste
+
+En este orden, siempre:
+
+1. Git: rama `feat/...` desde `develop`. Ver `git-workflow.mdc`.
+2. Producto: `PLAN.md` + `proveento-architecture.mdc`.
+3. Si cambia UI: skill `ui-ux-pro-max` + `ui-design.mdc`.
+4. Si toca Postgres/Supabase: skills `supabase` / `supabase-postgres-best-practices`.
+5. Next.js: leer la guía en `node_modules/next/dist/docs/` (App Router).
+
+No improvisar fuera de estas reglas. Si hay conflicto, gana PLAN + Blind Broker.
+---

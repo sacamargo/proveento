@@ -1,0 +1,29 @@
+---
+description: Arquitectura y reglas de negocio de Proveento (PLAN.md)
+alwaysApply: true
+---
+
+# Arquitectura Proveento
+
+Antes de tocar código, lee `PLAN.md`. Ejecuta solo la fase pedida.
+
+## Negocio
+
+- Marketplace inverso B2B: comprador publica Request; admin/Concierge carga Proposal.
+- Blind Broker: un BUYER jamás ve identidad, email, teléfono o nombre del proveedor si `proposal.status !== "ACCEPTED"`. Excluir `provider` en backend, no solo en UI.
+
+## Stack obligatorio
+
+- Next.js App Router, TypeScript estricto, Tailwind, Shadcn UI, React Hook Form + Zod, Prisma, Supabase.
+
+## Código
+
+- UI solo con Shadcn: `<Button>`, `<Dialog>`, `<Input>`, `<Form>`, etc.
+- Mutaciones en Server Actions bajo `src/actions`. Sin API routes salvo webhooks/auth callback.
+- Leer datos en Server Components. Pasar props a Client Components.
+- No inventar columnas ni romper el schema de Prisma del PLAN.
+
+## Fases
+
+1. Infra  2. Formulario Request  3. Panel admin  4. Compare ciego
+---
