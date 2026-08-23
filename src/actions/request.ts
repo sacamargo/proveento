@@ -44,5 +44,6 @@ export async function createRequest(
   });
 
   revalidatePath("/");
+  revalidatePath("/admin/dashboard");
   redirect("/?creada=1");
 }

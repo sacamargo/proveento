@@ -19,10 +19,15 @@ import {
 } from "@/components/ui/popover";
 import { normalizeSearch } from "@/lib/colombia";
 
+export type SearchableSelectOption = {
+  value: string;
+  label: string;
+};
+
 type SearchableSelectProps = {
   id: string;
   value: string;
-  options: string[];
+  options: Array<string | SearchableSelectOption>;
   placeholder: string;
   searchPlaceholder: string;
   emptyText: string;
@@ -30,6 +35,14 @@ type SearchableSelectProps = {
   invalid?: boolean;
   onChange: (value: string) => void;
 };
+
+function toOptions(
+  options: Array<string | SearchableSelectOption>,
+): SearchableSelectOption[] {
+  return options.map((option) =>
+    typeof option === "string" ? { value: option, label: option } : option,
+  );
+}
 
 export function SearchableSelect({
   id,
@@ -43,6 +56,9 @@ export function SearchableSelect({
   onChange,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
+  const normalizedOptions = toOptions(options);
+  const selectedLabel =
+    normalizedOptions.find((option) => option.value === value)?.label ?? value;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -58,7 +74,7 @@ export function SearchableSelect({
           className="h-auto min-h-11 w-full justify-between font-normal"
         >
           <span className={value ? "text-foreground" : "text-muted-foreground"}>
-            {value || placeholder}
+            {value ? selectedLabel : placeholder}
           </span>
           <ChevronsUpDown data-icon="inline-end" />
         </Button>
@@ -76,17 +92,17 @@ export function SearchableSelect({
           <CommandList className="max-h-60">
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {normalizedOptions.map((option) => (
                 <CommandItem
-                  key={option}
-                  value={option}
-                  data-checked={option === value || undefined}
+                  key={option.value}
+                  value={option.label}
+                  data-checked={option.value === value || undefined}
                   onSelect={() => {
-                    onChange(option);
+                    onChange(option.value);
                     setOpen(false);
                   }}
                 >
-                  {option}
+                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>

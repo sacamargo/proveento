@@ -21,6 +21,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { getCities, getDepartments } from "@/lib/colombia";
+import { optionalLabel } from "@/lib/format";
 import {
   createRequestSchema,
   type CreateRequestInput,
@@ -214,9 +215,8 @@ export function NewRequestForm() {
                   render={({ field: itemField, fieldState }) => (
                     <Field data-invalid={fieldState.invalid || undefined}>
                       <FieldLabel htmlFor={`item-desc-${index}`}>
-                        Descripción
+                        {optionalLabel("Descripción")}
                       </FieldLabel>
-                      <FieldDescription>Opcional.</FieldDescription>
                       <Textarea
                         {...itemField}
                         id={`item-desc-${index}`}

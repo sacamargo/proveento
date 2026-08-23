@@ -3,6 +3,11 @@ import type { User as AuthUser } from "@supabase/supabase-js";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 
+function isAdminEmail(email: string): boolean {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  return Boolean(adminEmail && email.toLowerCase() === adminEmail);
+}
+
 function displayName(user: AuthUser): string {
   const metadataName = user.user_metadata.name;
   if (typeof metadataName === "string" && metadataName.trim().length > 0) {
@@ -25,10 +30,11 @@ export async function ensureUserProfile(user: AuthUser) {
       id: user.id,
       email,
       name: displayName(user),
-      role: "BUYER",
+      role: isAdminEmail(email) ? "ADMIN" : "BUYER",
     },
     update: {
       email,
+      ...(isAdminEmail(email) ? { role: "ADMIN" as const } : {}),
     },
   });
 }
@@ -54,6 +60,12 @@ export async function getCurrentProfile() {
   try {
     const profile = await prisma.user.findUnique({ where: { id: user.id } });
     if (profile) {
+      if (isAdminEmail(profile.email) && profile.role !== "ADMIN") {
+        return prisma.user.update({
+          where: { id: profile.id },
+          data: { role: "ADMIN" },
+        });
+      }
       return profile;
     }
     return ensureUserProfile(user);

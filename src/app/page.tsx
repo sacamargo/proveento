@@ -51,9 +51,20 @@ export default async function HomePage({
                 {profile ? ` · ${profile.role}` : null}
               </p>
               <div className="flex flex-col gap-2 sm:flex-row">
-                <Button asChild className="min-h-11">
-                  <Link href="/request/new">Nueva solicitud</Link>
-                </Button>
+                {profile?.role === "ADMIN" ? (
+                  <Button asChild className="min-h-11">
+                    <Link href="/admin/dashboard">Panel concierge</Link>
+                  </Button>
+                ) : (
+                  <Button asChild className="min-h-11">
+                    <Link href="/request/new">Nueva solicitud</Link>
+                  </Button>
+                )}
+                {profile?.role === "ADMIN" ? (
+                  <Button asChild variant="secondary" className="min-h-11">
+                    <Link href="/request/new">Nueva solicitud</Link>
+                  </Button>
+                ) : null}
                 <form action={logout}>
                   <Button
                     type="submit"
