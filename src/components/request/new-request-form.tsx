@@ -17,22 +17,27 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { getCities, getDepartments } from "@/lib/colombia";
 import {
   createRequestSchema,
   type CreateRequestInput,
 } from "@/lib/validations/request";
 
+const DEPARTMENTS = getDepartments();
+
 const STEPS = [
   { id: "items", title: "Productos", fields: ["items"] as const },
-  { id: "city", title: "Ciudad", fields: ["city"] as const },
+  { id: "location", title: "Ubicación", fields: ["department", "city"] as const },
   { id: "deadline", title: "Fecha", fields: ["deadline"] as const },
   { id: "review", title: "Revisión", fields: [] as const },
 ];
 
 const defaultValues: CreateRequestInput = {
   items: [{ name: "", quantity: 1, description: "" }],
+  department: "",
   city: "",
   deadline: "",
 };
@@ -78,6 +83,8 @@ export function NewRequestForm() {
   }
 
   const values = form.watch();
+  const selectedDepartment = values.department;
+  const cityOptions = getCities(selectedDepartment);
 
   return (
     <form
@@ -209,6 +216,7 @@ export function NewRequestForm() {
                       <FieldLabel htmlFor={`item-desc-${index}`}>
                         Descripción
                       </FieldLabel>
+                      <FieldDescription>Opcional.</FieldDescription>
                       <Textarea
                         {...itemField}
                         id={`item-desc-${index}`}
@@ -245,24 +253,64 @@ export function NewRequestForm() {
 
       {step === 1 ? (
         <FieldSet>
-          <FieldLegend>Ciudad de entrega</FieldLegend>
-          <Controller
-            control={form.control}
-            name="city"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid || undefined}>
-                <FieldLabel htmlFor="city">Ciudad</FieldLabel>
-                <Input
-                  {...field}
-                  id="city"
-                  autoComplete="address-level2"
-                  aria-invalid={fieldState.invalid}
-                  aria-describedby={fieldState.error ? "city-error" : undefined}
-                />
-                <FieldError id="city-error" errors={[fieldState.error]} />
-              </Field>
-            )}
-          />
+          <FieldLegend>Ubicación de entrega</FieldLegend>
+          <FieldDescription>
+            Elige primero el departamento. Luego podrás buscar la ciudad o el
+            pueblo.
+          </FieldDescription>
+          <FieldGroup className="mt-4">
+            <Controller
+              control={form.control}
+              name="department"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid || undefined}>
+                  <FieldLabel htmlFor="department">Departamento</FieldLabel>
+                  <SearchableSelect
+                    id="department"
+                    value={field.value}
+                    options={DEPARTMENTS}
+                    placeholder="Selecciona un departamento"
+                    searchPlaceholder="Escribe para buscar…"
+                    emptyText="No hay departamentos con ese nombre."
+                    invalid={fieldState.invalid}
+                    onChange={(next) => {
+                      field.onChange(next);
+                      form.setValue("city", "", { shouldValidate: false });
+                    }}
+                  />
+                  <FieldError
+                    id="department-error"
+                    errors={[fieldState.error]}
+                  />
+                </Field>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="city"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid || undefined}>
+                  <FieldLabel htmlFor="city">Ciudad</FieldLabel>
+                  <SearchableSelect
+                    id="city"
+                    value={field.value}
+                    options={cityOptions}
+                    placeholder={
+                      selectedDepartment
+                        ? "Selecciona una ciudad"
+                        : "Primero elige el departamento"
+                    }
+                    searchPlaceholder="Escribe para buscar…"
+                    emptyText="No hay ciudades con ese nombre."
+                    disabled={!selectedDepartment}
+                    invalid={fieldState.invalid}
+                    onChange={field.onChange}
+                  />
+                  <FieldError id="city-error" errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+          </FieldGroup>
         </FieldSet>
       ) : null}
 
@@ -304,8 +352,8 @@ export function NewRequestForm() {
           </h2>
           <div className="grid gap-3 rounded-xl border border-border bg-card p-4 text-sm">
             <p>
-              <span className="text-muted-foreground">Ciudad: </span>
-              {values.city}
+              <span className="text-muted-foreground">Ubicación: </span>
+              {values.city}, {values.department}
             </p>
             <p>
               <span className="text-muted-foreground">Fecha límite: </span>
@@ -316,9 +364,11 @@ export function NewRequestForm() {
               {values.items.map((item, index) => (
                 <li key={`${item.name}-${index}`}>
                   {item.quantity} × {item.name}
-                  <span className="block text-muted-foreground">
-                    {item.description}
-                  </span>
+                  {item.description ? (
+                    <span className="block text-muted-foreground">
+                      {item.description}
+                    </span>
+                  ) : null}
                 </li>
               ))}
             </ul>

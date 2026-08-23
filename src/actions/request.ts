@@ -33,9 +33,13 @@ export async function createRequest(
   await prisma.request.create({
     data: {
       buyerId: profile.id,
-      city: parsed.data.city,
+      city: `${parsed.data.city}, ${parsed.data.department}`,
       deadline: new Date(`${parsed.data.deadline}T12:00:00`),
-      items: parsed.data.items as Prisma.InputJsonValue,
+      items: parsed.data.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        ...(item.description ? { description: item.description } : {}),
+      })) as Prisma.InputJsonValue,
     },
   });
 
